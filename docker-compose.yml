@@ -1,4 +1,38 @@
 services:
+  dev-postgres:
+    image: postgres:17
+    container_name: dev-postgres
+    networks: [ dev ]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+
+  hishtory:
+    image: lscr.io/linuxserver/hishtory-server:latest
+    container_name: hishtory
+    networks: [ proxy, dev ]
+    depends_on: [ dev-postgres ]
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: ${TZ}
+      HISHTORY_POSTGRES_DB: postgres://${POSTGRES_USER}:${POSTGRESS_PASSWORD}@dev-postgres:5432/hishtory?sslmode=disable
+    volumes:
+      - ./hishtory:/config:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.hishtory.rule=Host(`hishtory.${DOMAIN}`)"
+      - "traefik.http.routers.hishtory.entrypoints=websecure"
+      - "traefik.http.routers.hishtory.tls.certresolver=letsencrypt"
+      - "traefik.http.services.hishtory.loadbalancer.server.port=8080"
+      - "com.centurylinklabs.watchtower.enable=true"
+
   code-server:
     image: linuxserver/code-server:latest
     container_name: code-server
@@ -11,7 +45,7 @@ services:
     volumes:
       - ./code-server/config:/config
       - ./code-server/workspace:/workspace
-    networks: [ proxy ]
+    networks: [ proxy, dev ]
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -24,3 +58,5 @@ services:
 networks:
   proxy:
     external: true
+  dev:
+    driver: bridge
