@@ -21,7 +21,7 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: ${TZ}
-      HISHTORY_POSTGRES_DB: postgres://${POSTGRES_USER}:${POSTGRESS_PASSWORD}@dev-postgres:5432/hishtory?sslmode=disable
+      HISHTORY_POSTGRES_DB: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@dev-postgres:5432/hishtory?sslmode=disable
     volumes:
       - ./hishtory:/config:ro
     labels:
