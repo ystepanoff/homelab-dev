@@ -24,6 +24,8 @@ services:
       HISHTORY_POSTGRES_DB: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@dev-postgres:5432/hishtory?sslmode=disable
     volumes:
       - ./hishtory:/config:ro
+    ports:
+      - 127.0.0.1:8080:8080
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
