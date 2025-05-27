@@ -44,6 +44,7 @@ services:
       - TZ=${TZ}
       - PASSWORD=${CODE_SERVER_PASSWORD}
       - DEFAULT_WORKSPACE=/workspace
+    restart: always
     volumes:
       - ./code-server/config:/config
       - ./code-server/workspace:/workspace
